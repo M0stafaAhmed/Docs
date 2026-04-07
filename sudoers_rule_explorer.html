@@ -1,0 +1,319 @@
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.12);
+    --text: #e5e7eb;
+    --muted: #94a3b8;
+    --accent: #3b82f6;
+    --radius: 14px;
+  }
+
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: var(--text);
+  }
+
+  .wrap {
+    max-width: 900px;
+    margin: auto;
+    padding: 2rem 1rem;
+  }
+
+  /* Top Rule Bar */
+  .rule-bar {
+    display: flex;
+    border-radius: var(--radius);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .field {
+    flex: 1;
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .25s ease;
+    position: relative;
+  }
+
+  .field:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .field.active {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+  }
+
+  .field.active .label,
+  .field.active .val {
+    color: white;
+  }
+
+  .label {
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .val {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* Detail Card */
+  .detail {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+    animation: fadeIn .3s ease;
+  }
+
+  .detail h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+  }
+
+  .detail p {
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .detail code {
+    background: rgba(0,0,0,0.4);
+    padding: 3px 6px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  /* Examples */
+  h2 {
+    margin-top: 2rem;
+    font-size: 16px;
+    color: var(--muted);
+  }
+
+  .examples {
+    display: grid;
+    gap: 12px;
+    margin-top: 1rem;
+  }
+
+  .ex {
+    padding: 14px;
+    border-radius: var(--radius);
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: all .25s ease;
+    cursor: pointer;
+  }
+
+  .ex:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  }
+
+  .ex-rule {
+    font-family: monospace;
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .ex-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* Colored Tokens */
+  .ex-who { color: #38bdf8; }
+  .ex-where { color: #86efac; }
+  .ex-as { color: #fbbf24; }
+  .ex-what { color: #c084fc; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .leg {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .leg span {
+    font-weight: 600;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<div class="wrap">
+  <div class="rule-bar" id="rule-bar">
+    <div class="field active" data-field="0" onclick="select(0)">
+      <div class="label">WHO</div>
+      <div class="val">user / %group</div>
+    </div>
+    <div class="field" data-field="1" onclick="select(1)">
+      <div class="label">WHERE</div>
+      <div class="val">hostname</div>
+    </div>
+    <div class="field" data-field="2" onclick="select(2)">
+      <div class="label">RUN AS USER</div>
+      <div class="val">(user)</div>
+    </div>
+    <div class="field" data-field="3" onclick="select(3)">
+      <div class="label">RUN AS GROUP</div>
+      <div class="val">(:group)</div>
+    </div>
+    <div class="field" data-field="4" onclick="select(4)">
+      <div class="label">WHAT</div>
+      <div class="val">commands</div>
+    </div>
+  </div>
+
+  <div class="detail" id="detail"></div>
+
+  <h2>Examples — click any rule to explore it</h2>
+  <div class="legend">
+    <div class="leg"><span class="ex-who">WHO</span></div>
+    <div class="leg"><span class="ex-where">WHERE</span></div>
+    <div class="leg"><span class="ex-as">RUN AS</span></div>
+    <div class="leg"><span class="ex-what">WHAT</span></div>
+  </div>
+  <div class="examples" id="examples"></div>
+</div>
+
+<script>
+  const fields = [
+    {
+      name: "WHO — who is allowed",
+      desc: "Specifies which user or group the rule applies to. Plain names = users. A <code>%</code> prefix = a Unix group. <code>ALL</code> = every user on the system.",
+      values: [
+        ["alice", "Single user named alice"],
+        ["%sudo", "All members of the sudo group"],
+        ["%wheel", "All members of the wheel group (common on RHEL/Fedora)"],
+        ["ALL", "Every user — rarely used alone, typically paired with restrictions elsewhere"],
+        ["#1001", "User with UID 1001 (numeric UID syntax)"],
+      ]
+    },
+    {
+      name: "WHERE — which host(s)",
+      desc: "Controls which machine(s) the rule is active on. Most useful when a single sudoers file is distributed across a fleet via tools like Puppet or Ansible.",
+      values: [
+        ["ALL", "Any host — the safe default when not distributing sudoers centrally"],
+        ["webserver01", "Only the machine whose hostname is webserver01"],
+        ["192.168.1.50", "Only the machine with that IP address"],
+        ["PRODUCTION", "A Host_Alias group you define at the top of sudoers (e.g. Host_Alias PRODUCTION = web1, db1)"],
+      ]
+    },
+    {
+      name: "RUN AS USER — impersonate which user",
+      desc: "The user identity the command runs under. Invoked with <code>sudo -u username cmd</code>. <code>ALL</code> means any user. Omitting this field entirely defaults to root.",
+      values: [
+        ["ALL", "Can impersonate any user"],
+        ["root", "Can only run as root (explicit, same as default)"],
+        ["www-data", "Can only run as the web server user"],
+        ["postgres", "Can only run as the database user — useful for DBAs"],
+        ["!root", "Can run as anyone EXCEPT root (the ! negates)"],
+      ]
+    },
+    {
+      name: "RUN AS GROUP — use which group",
+      desc: "Controls the group identity. Invoked with <code>sudo -g groupname cmd</code>. Only present when a colon appears inside the parentheses: <code>(user:group)</code>.",
+      values: [
+        ["ALL", "Can use any group"],
+        [":docker", "Can run with docker group — grants socket access without full root"],
+        [":www-data", "Can run with web server group — useful for file permission tasks"],
+        ["(omitted)", "If no colon, group switching is not permitted at all"],
+      ]
+    },
+    {
+      name: "WHAT — which commands",
+      desc: "A comma-separated list of absolute paths to commands the user may run. Supports wildcards, negation with <code>!</code>, and the special tags <code>NOPASSWD:</code> and <code>NOEXEC:</code>.",
+      values: [
+        ["ALL", "Every command — full root access"],
+        ["/bin/systemctl", "Only the systemctl binary, no arguments restricted"],
+        ["/bin/systemctl restart nginx", "Only this exact command with this exact argument"],
+        ["/usr/bin/apt-get install *", "apt-get install with any package name (wildcard)"],
+        ["NOPASSWD: /sbin/reboot", "Can reboot without entering a password"],
+        ["!/bin/bash, !/bin/sh", "Everything EXCEPT spawning a shell — closes privilege escalation"],
+        ["NOEXEC: /usr/bin/less", "less can't shell out to spawn child processes"],
+      ]
+    }
+  ];
+
+  const examples = [
+    {
+      who: "deploy", where: "ALL", as: "(www-data:www-data)", what: "NOPASSWD: /usr/bin/rsync",
+      desc: "CI/CD deploy user can rsync files as www-data, no password prompt — common in automated pipelines."
+    },
+    {
+      who: "%dba", where: "dbserver", as: "(postgres:postgres)", what: "/usr/bin/psql, /usr/bin/pg_dump",
+      desc: "All DBA group members can run psql and pg_dump as the postgres user, but only on the database server."
+    },
+    {
+      who: "alice", where: "ALL", as: "(ALL)", what: "NOPASSWD: /bin/systemctl restart nginx, /bin/systemctl reload nginx",
+      desc: "Alice can restart or reload nginx without a password — useful for on-call engineers."
+    },
+    {
+      who: "%developers", where: "ALL", as: "(root)", what: "/usr/bin/apt-get install *, !/usr/bin/apt-get remove *",
+      desc: "Developers can install packages but cannot remove them — the ! negation blocks removal."
+    },
+    {
+      who: "monitoring", where: "ALL", as: "(root)", what: "NOPASSWD: NOEXEC: /usr/bin/find, /usr/bin/grep",
+      desc: "Monitoring agent can search files as root but NOEXEC prevents these tools from spawning shells."
+    },
+    {
+      who: "%sysadmin", where: "PRODUCTION", as: "(ALL:ALL)", what: "ALL",
+      desc: "Sysadmins have full sudo on production servers only — the WHERE field restricts the blast radius."
+    },
+    {
+      who: "bob", where: "ALL", as: "(root)", what: "!/bin/bash, !/bin/sh, !/bin/dash, !/usr/bin/python3, ALL",
+      desc: "Bob gets full sudo EXCEPT shell interpreters — attempts to close common privilege escalation paths."
+    },
+    {
+      who: "#1001", where: "192.168.1.10", as: "(root)", what: "/sbin/reboot",
+      desc: "UID 1001 can only reboot, and only from the machine at that IP — ultra-scoped physical console rule."
+    },
+  ];
+
+  let active = 0;
+
+  function select(i) {
+    active = i;
+    document.querySelectorAll('.field').forEach((f, idx) => f.classList.toggle('active', idx === i));
+    const f = fields[i];
+    const detail = document.getElementById('detail');
+    detail.innerHTML = `<h3>${f.name}</h3><p>${f.desc}</p>` +
+      f.values.map(([v, d]) => `<div style="display:flex;align-items:baseline;gap:10px;margin:4px 0"><code>${v}</code><span style="font-size:13px;color:var(--color-text-secondary)">${d}</span></div>`).join('');
+  }
+
+  function renderExamples() {
+    const colors = ['ex-who', 'ex-where', 'ex-as', 'ex-who', 'ex-what'];
+    document.getElementById('examples').innerHTML = examples.map((e, i) => {
+      const rule = `<span class="ex-who">${e.who}</span> <span class="ex-where">${e.where}</span>=<span class="ex-as">${e.as}</span> <span class="ex-what">${e.what}</span>`;
+      return `<div class="ex" onclick="sendPrompt('Explain this sudoers rule: ${e.who} ${e.where}=(${e.as}) ${e.what}')">
+      <div class="ex-rule">${rule}</div>
+      <div class="ex-desc">${e.desc}</div>
+    </div>`;
+    }).join('');
+  }
+
+  select(0);
+  renderExamples();
+</script>
