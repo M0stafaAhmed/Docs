@@ -1,0 +1,1821 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VIM Cheat Sheet — Merged Edition</title>
+  <meta name="description" content="Merged VIM cheat sheet with maximum commands, tips, tricks, and icons." />
+  <link rel="icon" type="image/svg+xml" href="https://www.vim.org/images/vimlogo.svg" />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --bg2: #111a33;
+      --card: rgba(255,255,255,.07);
+      --card-strong: rgba(255,255,255,.10);
+      --border: rgba(255,255,255,.14);
+      --fg: #eef4ff;
+      --muted: #a8b3cf;
+      --accent: #7cdbff;
+      --accent2: #9b7bff;
+      --good: #6ee7b7;
+      --shadow: 0 18px 50px rgba(0,0,0,.28);
+      --radius: 22px;
+      --code-bg: rgba(255,255,255,.08);
+    }
+    html[data-theme="light"] {
+      --bg: #f4f7fb;
+      --bg2: #e8eef9;
+      --card: rgba(255,255,255,.76);
+      --card-strong: rgba(255,255,255,.92);
+      --border: rgba(15,23,42,.10);
+      --fg: #0f172a;
+      --muted: #52607a;
+      --accent: #0f6fff;
+      --accent2: #7c3aed;
+      --good: #047857;
+      --shadow: 0 16px 40px rgba(15,23,42,.08);
+      --code-bg: rgba(15,23,42,.05);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; min-height:100%; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(1200px circle at top left, color-mix(in srgb, var(--accent) 16%, transparent), transparent 28%),
+        radial-gradient(900px circle at top right, color-mix(in srgb, var(--accent2) 18%, transparent), transparent 24%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color: var(--fg);
+      line-height: 1.55;
+    }
+    a { color: inherit; text-decoration: none; }
+    .page { max-width: 1440px; margin: 0 auto; padding: 20px; }
+    .hero {
+      display:flex; gap:16px; align-items:center; justify-content:space-between;
+      padding: 18px 18px 16px; border: 1px solid var(--border); background: var(--card);
+      border-radius: calc(var(--radius) + 6px); box-shadow: var(--shadow); backdrop-filter: blur(14px);
+      position: sticky; top: 12px; z-index: 20;
+    }
+    .brand { display:flex; align-items:center; gap:14px; min-width: 0; }
+    .brand img { width: 48px; height: 48px; object-fit: contain; border-radius: 12px; }
+    h1 { margin:0; font-size: clamp(1.35rem, 2vw, 2.1rem); letter-spacing: -.03em; line-height: 1.1; }
+    .subtitle { color: var(--muted); font-size: .95rem; margin-top: 4px; }
+    .toolbar { display:flex; align-items:center; gap:10px; flex-wrap: wrap; justify-content: flex-end; }
+    .search-wrap { position: relative; min-width: min(460px, 100%); flex: 1 1 280px; }
+    .search-wrap input {
+      width: 100%; padding: 12px 14px 12px 42px; border-radius: 16px; border: 1px solid var(--border);
+      background: var(--card-strong); color: var(--fg); outline: none;
+    }
+    .search-wrap input::placeholder { color: color-mix(in srgb, var(--muted) 75%, transparent); }
+    .search-icon { position:absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity:.75; }
+    .btn {
+      border: 1px solid var(--border); background: var(--card-strong); color: var(--fg);
+      padding: 11px 14px; border-radius: 14px; cursor: pointer; transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      font-weight: 600;
+    }
+    .btn:hover { transform: translateY(-1px); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+    .btn.primary { background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 80%, white), color-mix(in srgb, var(--accent2) 65%, white)); color: white; border-color: transparent; }
+    .layout { display:grid; grid-template-columns: 290px minmax(0, 1fr); gap: 18px; margin-top: 18px; align-items:start; }
+    .toc-card, .mode-section { border: 1px solid var(--border); background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+    .toc-card { position: sticky; top: 92px; padding: 16px; }
+    .toc-title { font-size: 1.1rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: 12px; }
+    .toc-title.small { font-size: .95rem; margin-top: 14px; }
+    .toc-list, .kbd-list { margin: 0; padding-left: 20px; color: var(--muted); }
+    .toc-list li + li, .kbd-list li + li { margin-top: 8px; }
+    .kbd-box { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+    kbd {
+      display:inline-block; min-width: 1.7em; text-align:center; padding: 2px 7px; margin-right: 4px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--code-bg); color: var(--fg); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em;
+    }
+    .content { display:flex; flex-direction:column; gap: 16px; }
+    .mode-section { overflow: hidden; }
+    .mode-header {
+      display:flex; align-items:center; gap: 12px; padding: 16px 18px; cursor: pointer;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent2) 12%, transparent));
+      border-bottom: 1px solid var(--border);
+      user-select: none;
+    }
+    .mode-header:hover { filter: brightness(1.03); }
+    .mode-icon { font-size: 1.35rem; width: 1.7rem; text-align: center; flex: 0 0 auto; }
+    .mode-header span:nth-child(2) { font-size: 1.06rem; font-weight: 800; }
+    .collapse-icon { margin-left:auto; transition: transform .18s ease; opacity:.8; }
+    .mode-section.collapsed .collapse-icon { transform: rotate(-90deg); }
+    .mode-content { padding: 16px 18px 18px; display:block; }
+    .mode-section.collapsed .mode-content { display:none; }
+    .functionality-group + .functionality-group { margin-top: 18px; }
+    .functionality-header { margin: 0 0 10px; font-size: 1.02rem; color: var(--accent); letter-spacing: -.01em; }
+    .shortcut-item {
+      display:flex; gap: 12px; align-items:flex-start; padding: 10px 12px; border: 1px solid transparent;
+      border-radius: 16px; transition: background .12s ease, border-color .12s ease, transform .12s ease;
+    }
+    .shortcut-item:hover { background: color-mix(in srgb, var(--card-strong) 65%, transparent); border-color: var(--border); transform: translateY(-1px); }
+    .shortcut-item + .shortcut-item { margin-top: 8px; }
+    .shortcut-info { flex: 1; min-width: 0; }
+    .shortcut {
+      display:inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .96rem; padding: 3px 8px; border-radius: 999px; background: var(--code-bg); border: 1px solid var(--border); color: var(--accent);
+      word-break: break-word;
+    }
+    .explanation { display:block; color: var(--muted); margin-top: 6px; }
+    .copy-btn {
+      flex: 0 0 auto; border: 1px solid var(--border); background: var(--card-strong); color: var(--fg);
+      border-radius: 12px; padding: 8px 10px; cursor: pointer; line-height: 1; min-width: 42px;
+    }
+    .copy-btn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+    .footer { text-align:center; color: var(--muted); padding: 18px 0 4px; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
+    @media (max-width: 1120px) { .layout { grid-template-columns: 1fr; } .toc-card { position: static; } .hero { position: static; } }
+    @media (max-width: 720px) {
+      .hero { flex-direction: column; align-items: stretch; }
+      .toolbar { justify-content: stretch; }
+      .search-wrap { min-width: 0; flex-basis: 100%; }
+      .btn { flex: 1 1 140px; }
+      .shortcut-item { flex-direction: column; }
+      .copy-btn { align-self: flex-start; }
+    }
+    @media print {
+      body { background: white; color: black; }
+      .hero, .toc-card, .copy-btn, .footer { box-shadow: none !important; }
+      .hero { position: static; }
+      .btn, .search-wrap { display:none !important; }
+      .mode-section { break-inside: avoid; }
+      .mode-section.collapsed .mode-content { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="brand">
+        <img src="https://www.vim.org/images/vim_on_fire.gif" alt="Vim fire icon" />
+        <div>
+          <h1>VIM Cheat Sheet</h1>
+          <div class="subtitle">Made with love by Mostafa Ahmed ❤️.</div>
+        </div>
+      </div>
+      <div class="toolbar" role="toolbar" aria-label="Search and view controls">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input id="search-input" type="search" placeholder="Search commands, tips, or descriptions…" aria-label="Search commands" />
+        </div>
+        <button class="btn" id="btn-clear" type="button">Clear</button>
+        <button class="btn primary" id="btn-toggle-theme" type="button" title="Toggle theme">🌙</button>
+        <button class="btn" id="btn-expand-all" type="button">Expand All</button>
+        <button class="btn" id="btn-collapse-all" type="button">Collapse All</button>
+        <button class="btn" id="btn-print" type="button">Print</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      
+<aside class="toc-card" aria-label="Table of contents">
+  <div class="toc-title">Contents</div>
+  <ol class="toc-list">
+    <li><a href="#normal">Normal Mode</a></li>
+    <li><a href="#insert">Insert Mode</a></li>
+    <li><a href="#visual">Visual Mode</a></li>
+    <li><a href="#cmdline">Command-line Mode</a></li>
+    <li><a href="#replace">Replace Mode</a></li>
+    <li><a href="#select">Select Mode</a></li>
+    <li><a href="#ex">Ex Mode</a></li>
+    <li><a href="#tips">Pro Tips &amp; Examples</a></li>
+  </ol>
+  <div class="kbd-box">
+    <div class="toc-title small">Keyboard shortcuts:</div>
+    <ul class="kbd-list">
+      <li><kbd>t</kbd> toggle theme</li>
+      <li><kbd>/</kbd> focus search</li>
+      <li><kbd>e</kbd> expand/collapse section (when header focused)</li>
+    </ul>
+  </div>
+</aside>
+
+      <section id="content" class="content" aria-live="polite">
+        <section class="mode-section collapsed" data-mode="normal" id="normal">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅝</span>
+<span>Normal Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">h</code>
+<span class="explanation">Move cursor left (like left arrow).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('h')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">j</code>
+<span class="explanation">Move cursor down (like down arrow).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('j')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">k</code>
+<span class="explanation">Move cursor up (like up arrow).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('k')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">l</code>
+<span class="explanation">Move cursor right (like right arrow).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('l')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">w</code>
+<span class="explanation">Move to next word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">b</code>
+<span class="explanation">Move to previous word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('b')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">0</code>
+<span class="explanation">Move to start of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('0')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">$</code>
+<span class="explanation">Move to end of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('$')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">gg</code>
+<span class="explanation">Go to top of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('gg')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">G</code>
+<span class="explanation">Go to bottom of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('G')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}G</code>
+<span class="explanation">Go to line number n (e.g., 10G).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}G')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+u</code>
+<span class="explanation">Scroll up half a screen.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+u')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+d</code>
+<span class="explanation">Scroll down half a screen.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+d')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+f</code>
+<span class="explanation">Scroll forward one screen.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+f')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+b</code>
+<span class="explanation">Scroll backward one screen.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+b')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Editing</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">i</code>
+<span class="explanation">Enter insert mode before cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('i')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">a</code>
+<span class="explanation">Enter insert mode after cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('a')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">o</code>
+<span class="explanation">Open new line below and enter insert mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('o')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">O</code>
+<span class="explanation">Open new line above and enter insert mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('O')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">x</code>
+<span class="explanation">Delete character under cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('x')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}x</code>
+<span class="explanation">Delete n characters (e.g., 5x).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}x')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">dd</code>
+<span class="explanation">Delete entire line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('dd')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}dd</code>
+<span class="explanation">Delete n lines (e.g., 3dd).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}dd')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">yy</code>
+<span class="explanation">Yank (copy) entire line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('yy')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">p</code>
+<span class="explanation">Paste after cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('p')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">P</code>
+<span class="explanation">Paste before cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('P')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">u</code>
+<span class="explanation">Undo last change.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('u')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+r</code>
+<span class="explanation">Redo last undone change.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+r')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">r</code>
+<span class="explanation">Replace single character under cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('r')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">s</code>
+<span class="explanation">Delete character and enter insert mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('s')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">S</code>
+<span class="explanation">Delete line and enter insert mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('S')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">dw</code>
+<span class="explanation">Delete from cursor to end of word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('dw')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">d$</code>
+<span class="explanation">Delete from cursor to end of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('d$')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">d0</code>
+<span class="explanation">Delete from cursor to start of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('d0')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">D</code>
+<span class="explanation">Delete to end of line (alias for d$).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('D')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">cw</code>
+<span class="explanation">Change (delete and enter insert) to end of word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('cw')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">C</code>
+<span class="explanation">Change to end of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('C')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Clipboard</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">yy</code>
+<span class="explanation">Yank (copy) current line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('yy')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">yw</code>
+<span class="explanation">Yank word under cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('yw')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}yy</code>
+<span class="explanation">Yank n lines (e.g., 3yy).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}yy')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">p</code>
+<span class="explanation">Paste after cursor or line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('p')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">P</code>
+<span class="explanation">Paste before cursor or line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('P')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">"+y</code>
+<span class="explanation">Yank to system clipboard (if clipboard support enabled).</span>
+</div>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Macros</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">qa</code>
+<span class="explanation">Start recording macro into register a (q followed by a-z).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('qa')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">q</code>
+<span class="explanation">Stop recording macro.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('q')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">@a</code>
+<span class="explanation">Replay macro from register a.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('@a')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}@a</code>
+<span class="explanation">Replay macro a, n times (e.g., 5@a).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}@a')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">@@</code>
+<span class="explanation">Replay last used macro.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('@@')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Buffers</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:bnext</code>
+<span class="explanation">Switch to next buffer (enter in command mode).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':bnext')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:bprev</code>
+<span class="explanation">Switch to previous buffer.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':bprev')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+^</code>
+<span class="explanation">Toggle between current and alternate buffer.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+^')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:ls</code>
+<span class="explanation">List all buffers.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':ls')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:b {n}</code>
+<span class="explanation">Switch to buffer number n.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':b {n}')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Windows</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w s</code>
+<span class="explanation">Split window horizontally.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w s')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w v</code>
+<span class="explanation">Split window vertically.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w v')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w w</code>
+<span class="explanation">Cycle to next window.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w h/j/k/l</code>
+<span class="explanation">Move cursor to window left/down/up/right.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w h/j/k/l')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w c</code>
+<span class="explanation">Close current window.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w c')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w =</code>
+<span class="explanation">Make all windows equal size.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w =')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Search &amp; Replace</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">/</code>
+<span class="explanation">Search forward for pattern.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('/')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">?</code>
+<span class="explanation">Search backward for pattern.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('?')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">n</code>
+<span class="explanation">Go to next search match.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('n')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">N</code>
+<span class="explanation">Go to previous search match.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('N')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">* </code>
+<span class="explanation">Search forward for word under cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('*')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">#</code>
+<span class="explanation">Search backward for word under cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('#')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Other</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:w</code>
+<span class="explanation">Save (write) file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:q</code>
+<span class="explanation">Quit VIM.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':q')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:q!</code>
+<span class="explanation">Quit without saving.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':q!')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">ZZ</code>
+<span class="explanation">Save and quit (like :wq).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('ZZ')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help</code>
+<span class="explanation">Open VIM help.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help')">📋</button>
+</div>
+</div>
+
+<div class="functionality-group">
+<h3 class="functionality-header">Registers</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">"&lt;reg&gt;{op}</code>
+<span class="explanation">Use a register before an operator, such as <code>"ayy</code> to yank into register a.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&quot;aY')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">"_d</code>
+<span class="explanation">Black-hole delete so the registers stay untouched.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&quot;_d')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">"+y</code>
+<span class="explanation">Yank to the system clipboard when clipboard support is enabled.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&quot;+y')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="insert" id="insert">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅘</span>
+<span>Insert Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation &amp; Editing</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Esc</code>
+<span class="explanation">Exit insert mode to normal mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Esc')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+[</code>
+<span class="explanation">Equivalent to Esc (exit insert mode).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+[')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w</code>
+<span class="explanation">Delete word before cursor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+u</code>
+<span class="explanation">Delete from cursor to start of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+u')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+h</code>
+<span class="explanation">Delete character before cursor (backspace).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+h')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+l</code>
+<span class="explanation">Delete character after cursor (like delete).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+l')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+o</code>
+<span class="explanation">Temporarily enter normal mode for one command, then back to insert.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+o')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+t</code>
+<span class="explanation">Increase indent (shift right).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+t')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+d</code>
+<span class="explanation">Decrease indent (shift left).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+d')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Other</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+r {register}</code>
+<span class="explanation">Insert contents of register (e.g., <code>"</code> for unnamed register).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+r {register}')">📋</button>
+</div>
+</div>
+</div></section>
+<section class="mode-section collapsed" data-mode="visual" id="visual">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅥</span>
+<span>Visual Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Entering Visual Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">v</code>
+<span class="explanation">Start visual character-wise selection.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('v')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">V</code>
+<span class="explanation">Start visual line-wise selection.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('V')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+v</code>
+<span class="explanation">Start visual block-wise selection.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+v')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation in Visual Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">h/j/k/l</code>
+<span class="explanation">Extend selection left/down/up/right.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('h/j/k/l')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">w/b</code>
+<span class="explanation">Extend selection to next/previous word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('w/b')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">$</code>
+<span class="explanation">Extend to end of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('$')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">0</code>
+<span class="explanation">Extend to start of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('0')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">G</code>
+<span class="explanation">Extend to end of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('G')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">gg</code>
+<span class="explanation">Extend to start of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('gg')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Editing in Visual Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">d</code>
+<span class="explanation">Delete selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('d')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">x</code>
+<span class="explanation">Delete selected text (alias for d).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('x')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">y</code>
+<span class="explanation">Yank (copy) selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('y')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">c</code>
+<span class="explanation">Change (delete and enter insert mode) selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('c')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">~</code>
+<span class="explanation">Toggle case of selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('~')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">&gt;</code>
+<span class="explanation">Indent selected lines right.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&gt;')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">&lt;</code>
+<span class="explanation">Indent selected lines left.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&lt;')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Exiting Visual Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Esc</code>
+<span class="explanation">Exit visual mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Esc')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+c</code>
+<span class="explanation">Exit visual mode (alternative).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+c')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="command-line" id="cmdline">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">:</span>
+<span>Command-line Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">File Operations</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:w</code>
+<span class="explanation">Write (save) the current file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:w filename</code>
+<span class="explanation">Save as a new file with the given name.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':w filename')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:q</code>
+<span class="explanation">Quit if no changes, or if saved.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':q')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:q!</code>
+<span class="explanation">Quit without saving changes.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':q!')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:wq</code>
+<span class="explanation">Write and quit.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':wq')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:x</code>
+<span class="explanation">Write if changes made, then quit (alias for :wq).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':x')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Search &amp; Replace</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:%s/old/new/g</code>
+<span class="explanation">Replace all occurrences of 'old' with 'new' in the file (global).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':%s/old/new/g')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:%s/old/new/gc</code>
+<span class="explanation">Replace with confirmation for each match.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':%s/old/new/gc')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:s/old/new</code>
+<span class="explanation">Replace first occurrence in current line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':s/old/new')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:s/old/new/g</code>
+<span class="explanation">Replace all in current line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':s/old/new/g')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation &amp; Buffers</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:n</code>
+<span class="explanation">Go to next file in arguments list.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':n')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:rew</code>
+<span class="explanation">Rewind to first file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':rew')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:bn</code>
+<span class="explanation">Next buffer.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':bn')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:bp</code>
+<span class="explanation">Previous buffer.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':bp')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:buffers</code>
+<span class="explanation">List all buffers (alias for :ls).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':buffers')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}G</code>
+<span class="explanation">Go to line n.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}G')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Other Commands</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help</code>
+<span class="explanation">Open help for VIM.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help topic</code>
+<span class="explanation">Help on specific topic (e.g., :help insert).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help topic')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:set number</code>
+<span class="explanation">Show line numbers.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':set number')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:set nonumber</code>
+<span class="explanation">Hide line numbers.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':set nonumber')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:version</code>
+<span class="explanation">Show VIM version info.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':version')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="replace" id="replace">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅡</span>
+<span>Replace Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Entering &amp; Basics</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">R</code>
+<span class="explanation">Enter replace mode: overwrite characters as you type.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('R')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Esc</code>
+<span class="explanation">Exit replace mode to normal mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Esc')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation &amp; Editing</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">← →</code>
+<span class="explanation">Move left/right while replacing (overwrites as you go).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('← →')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+w</code>
+<span class="explanation">Delete word before cursor in replace mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+w')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+h</code>
+<span class="explanation">Backspace: delete previous character.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+h')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+l</code>
+<span class="explanation">Delete next character (shifts text left).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+l')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Advanced</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{n}R</code>
+<span class="explanation">Replace exactly n characters (e.g., 5R then type).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{n}R')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="select" id="select">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅢</span>
+<span>Select Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Entering Select Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">gh</code>
+<span class="explanation">Start select mode character-wise (from normal mode).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('gh')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">gH</code>
+<span class="explanation">Start select mode line-wise.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('gH')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">g Ctrl+h</code>
+<span class="explanation">Start select mode block-wise.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('g Ctrl+h')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Navigation in Select Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">h/j/k/l</code>
+<span class="explanation">Extend selection left/down/up/right (similar to visual mode).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('h/j/k/l')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">w/b</code>
+<span class="explanation">Extend to next/previous word.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('w/b')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">$</code>
+<span class="explanation">Extend to end of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('$')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">0</code>
+<span class="explanation">Extend to start of line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('0')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">G</code>
+<span class="explanation">Extend to end of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('G')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">gg</code>
+<span class="explanation">Extend to start of file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('gg')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Editing in Select Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">d</code>
+<span class="explanation">Delete selected text (enters insert mode after).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('d')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">c</code>
+<span class="explanation">Change selected text (delete and enter insert mode).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('c')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">y</code>
+<span class="explanation">Yank (copy) selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('y')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">~</code>
+<span class="explanation">Toggle case of selected text.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('~')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">&gt;</code>
+<span class="explanation">Indent selected lines right.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&gt;')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">&lt;</code>
+<span class="explanation">Indent selected lines left.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('&lt;')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Any printable key</code>
+<span class="explanation">Start inserting/replacing at the start of selection (overwrites selection).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Any printable key')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Exiting Select Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Esc</code>
+<span class="explanation">Exit select mode to normal mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Esc')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+g</code>
+<span class="explanation">Exit select mode (alternative).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+g')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="ex" id="ex">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅔</span>
+<span>Ex Mode</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Entering Ex Mode</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Q</code>
+<span class="explanation">Enter Ex mode from normal mode (full-screen ex commands).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Q')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:visual</code>
+<span class="explanation">Exit Ex mode back to normal mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':visual')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Basic Ex Commands</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:print</code> or <code class="shortcut">p</code>
+<span class="explanation">Print (display) current line.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':print')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{range}p</code>
+<span class="explanation">Print lines in range (e.g., 1,5p).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{range}p')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:number</code> or <code class="shortcut">nu</code>
+<span class="explanation">Print line with line number.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':number')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:list</code> or <code class="shortcut">l</code>
+<span class="explanation">Print lines with unprintable characters visible.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':list')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Editing Commands</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:delete</code> or <code class="shortcut">d</code>
+<span class="explanation">Delete lines (e.g., 5d deletes line 5).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':delete')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">{range}d</code>
+<span class="explanation">Delete range of lines (e.g., 1,10d).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('{range}d')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:copy {line}</code> or <code class="shortcut">co</code>
+<span class="explanation">Copy lines to after specified line (e.g., 5co10).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':copy {line}')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:move {line}</code> or <code class="shortcut">m</code>
+<span class="explanation">Move lines to after specified line (e.g., 5m10).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':move {line}')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:substitute</code> or <code class="shortcut">s</code>
+<span class="explanation">Substitute in lines (e.g., s/old/new/g).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':substitute')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">File Operations</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:write</code> or <code class="shortcut">w</code>
+<span class="explanation">Write (save) the file or range to file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':write')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:quit</code> or <code class="shortcut">q</code>
+<span class="explanation">Quit Ex mode or the editor.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':quit')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:wq</code>
+<span class="explanation">Write and quit.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':wq')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:edit filename</code> or <code class="shortcut">e</code>
+<span class="explanation">Edit a new file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':edit filename')">📋</button>
+</div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Other</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:global /pattern/ command</code> or <code class="shortcut">g</code>
+<span class="explanation">Execute command on lines matching pattern (e.g., g/foo/d).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':global /pattern/ command')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:vglobal /pattern/ command</code> or <code class="shortcut">v</code>
+<span class="explanation">Execute on lines not matching pattern.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':vglobal /pattern/ command')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:!</code>
+<span class="explanation">Execute shell command (e.g., :!ls).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':!')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" data-mode="neovim" id="neovim">
+<div class="mode-header" onclick="toggleCollapse(this)" tabindex="0">
+<span class="mode-icon">🅝</span>
+<span>Neovim-only</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<!-- Built-in LSP -->
+<div class="functionality-group">
+<h3 class="functionality-header">Built-in LSP</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:LspInfo</code>
+<span class="explanation">Show active LSP client and server info.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':LspInfo')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:LspStart</code>
+<span class="explanation">Start the LSP client for the current buffer’s language.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':LspStart')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:LspStop</code>
+<span class="explanation">Stop the running LSP client.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':LspStop')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:LspRestart</code>
+<span class="explanation">Restart the LSP client.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':LspRestart')">📋</button>
+</div>
+</div>
+<!-- Tree-sitter -->
+<div class="functionality-group">
+<h3 class="functionality-header">Tree-sitter</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:TSInstall &lt;lang&gt;</code>
+<span class="explanation">Install Tree-sitter parser for a language.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':TSInstall &lt;lang&gt;')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:TSUninstall &lt;lang&gt;</code>
+<span class="explanation">Remove Tree-sitter parser.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':TSUninstall &lt;lang&gt;')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:TSUpdate</code>
+<span class="explanation">Update all installed Tree-sitter parsers.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':TSUpdate')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:TSModuleInfo</code>
+<span class="explanation">Show active Tree-sitter modules for current buffer.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':TSModuleInfo')">📋</button>
+</div>
+</div>
+<!-- Terminal -->
+<div class="functionality-group">
+<h3 class="functionality-header">Terminal</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:terminal</code>
+<span class="explanation">Open an interactive terminal buffer inside Neovim.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':terminal')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">Ctrl+\ Ctrl+n</code>
+<span class="explanation">Exit terminal mode back to normal mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('Ctrl+\\ Ctrl+n')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">i</code>
+<span class="explanation">Re-enter terminal insert mode.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard('i')">📋</button>
+</div>
+</div>
+<!-- Lua Integration -->
+<div class="functionality-group">
+<h3 class="functionality-header">Lua Integration</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:lua print("Hello")</code>
+<span class="explanation">Run inline Lua code inside Neovim.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':lua print(\'Hello\')')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:luafile %</code>
+<span class="explanation">Source and run the current Lua file.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':luafile %')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help lua-guide</code>
+<span class="explanation">Open Neovim’s Lua API guide.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help lua-guide')">📋</button>
+</div>
+</div>
+<!-- Async Jobs -->
+<div class="functionality-group">
+<h3 class="functionality-header">Async Jobs</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help jobstart()</code>
+<span class="explanation">Run background jobs asynchronously (non-blocking).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help jobstart()')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help rpcstart()</code>
+<span class="explanation">Start remote processes with RPC communication.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help rpcstart()')">📋</button>
+</div>
+</div>
+<!-- Floating Windows & UI -->
+<div class="functionality-group">
+<h3 class="functionality-header">Floating Windows &amp; UI</h3>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help nvim_open_win()</code>
+<span class="explanation">Open a floating window via API (Lua scripting).</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help nvim_open_win()')">📋</button>
+</div>
+<div class="shortcut-item">
+<div class="shortcut-info">
+<code class="shortcut">:help nvim_buf_set_lines()</code>
+<span class="explanation">Programmatically set buffer lines using Lua API.</span>
+</div>
+<button class="copy-btn" onclick="copyToClipboard(':help nvim_buf_set_lines()')">📋</button>
+</div>
+</div>
+</div>
+</section>
+<section class="mode-section collapsed" id="tips">
+<div class="mode-header" tabindex="0">
+<span class="mode-icon">✨</span>
+<span>Pro Tips &amp; Examples</span>
+<span class="collapse-icon">▼</span>
+</div>
+<div class="mode-content">
+<div class="functionality-group">
+<h3 class="functionality-header">Useful Command Examples</h3>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:set number</code><span class="explanation">Show line numbers. Use <code>:set relativenumber</code> for relative numbers.</span></div><button class="copy-btn" onclick="copyToClipboard(':set number')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:noh</code><span class="explanation">Clear search highlighting after a search.</span></div><button class="copy-btn" onclick="copyToClipboard(':noh')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:%s/\s\+$//e</code><span class="explanation">Trim trailing whitespace from the whole file.</span></div><button class="copy-btn" onclick="copyToClipboard(':%s/\s\+$//e')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:%!sort -u</code><span class="explanation">Sort the file and keep unique lines only.</span></div><button class="copy-btn" onclick="copyToClipboard(':%!sort -u')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:vimgrep /TODO/ **/* | copen</code><span class="explanation">Find TODOs across the project and open quickfix.</span></div><button class="copy-btn" onclick="copyToClipboard(':vimgrep /TODO/ **/* | copen')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:g/^\s*$/d</code><span class="explanation">Delete blank lines using a global command.</span></div><button class="copy-btn" onclick="copyToClipboard(':g/^\s*$/d')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:r !date</code><span class="explanation">Insert the output of an external command at the cursor.</span></div><button class="copy-btn" onclick="copyToClipboard(':r !date')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:vsplit +term</code><span class="explanation">Open a terminal in a vertical split in Neovim.</span></div><button class="copy-btn" onclick="copyToClipboard(':vsplit +term')">📋</button></div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Recommended Settings</h3>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">set nocompatible</code><span class="explanation">Disable vi-compat mode for modern defaults.</span></div></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">set mouse=a</code><span class="explanation">Enable mouse support when you want it.</span></div></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">set clipboard=unnamedplus</code><span class="explanation">Use the system clipboard where supported.</span></div></div>
+</div>
+<div class="functionality-group">
+<h3 class="functionality-header">Operator-Pending Power Moves</h3>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">ciw</code><span class="explanation">Change inside word.</span></div><button class="copy-btn" onclick="copyToClipboard('ciw')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">ci"</code><span class="explanation">Change inside double quotes.</span></div><button ')"="" class="copy-btn" onclick="copyToClipboard('ci">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">dap</code><span class="explanation">Delete around paragraph.</span></div><button class="copy-btn" onclick="copyToClipboard('dap')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">yip</code><span class="explanation">Yank inner paragraph.</span></div><button class="copy-btn" onclick="copyToClipboard('yip')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">gg=G</code><span class="explanation">Auto-indent the whole file.</span></div><button class="copy-btn" onclick="copyToClipboard('gg=G')">📋</button></div>
+<div class="shortcut-item"><div class="shortcut-info"><code class="shortcut">:%y+</code><span class="explanation">Copy the whole file to the system clipboard.</span></div><button class="copy-btn" onclick="copyToClipboard(':%y+')">📋</button></div>
+</div>
+</div>
+</section>
+      </section>
+    </main>
+
+    <footer class="footer">Made with love by <strong>Mostafa Ahmed</strong> ❤️</footer>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const themeKey = 'vim-cheatsheet-theme';
+    const storedTheme = localStorage.getItem(themeKey);
+    if (storedTheme) root.setAttribute('data-theme', storedTheme);
+    else root.setAttribute('data-theme', window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+
+    const themeBtn = document.getElementById('btn-toggle-theme');
+    const searchInput = document.getElementById('search-input');
+    const clearBtn = document.getElementById('btn-clear');
+    const expandAllBtn = document.getElementById('btn-expand-all');
+    const collapseAllBtn = document.getElementById('btn-collapse-all');
+    const printBtn = document.getElementById('btn-print');
+
+    function syncThemeIcon() {
+      themeBtn.textContent = root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
+    }
+    syncThemeIcon();
+
+    themeBtn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem(themeKey, next);
+      syncThemeIcon();
+    });
+
+    function toggleSection(section) {
+      section.classList.toggle('collapsed');
+    }
+
+    document.querySelectorAll('.mode-header').forEach(header => {
+      header.addEventListener('click', () => toggleSection(header.closest('.mode-section')));
+      header.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === 'e') {
+          e.preventDefault();
+          toggleSection(header.closest('.mode-section'));
+        }
+      });
+    });
+
+    expandAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-section').forEach(sec => sec.classList.remove('collapsed'));
+    });
+
+    collapseAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-section').forEach(sec => sec.classList.add('collapsed'));
+    });
+
+    printBtn.addEventListener('click', () => window.print());
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filterEntries('');
+      searchInput.focus();
+    });
+
+    searchInput.addEventListener('input', (e) => filterEntries(e.target.value));
+
+    function filterEntries(value) {
+      const q = value.trim().toLowerCase();
+      const sections = document.querySelectorAll('.mode-section');
+      sections.forEach(section => {
+        let matched = false;
+        section.querySelectorAll('.shortcut-item').forEach(item => {
+          const text = item.textContent.toLowerCase();
+          const ok = !q || text.includes(q);
+          item.style.display = ok ? '' : 'none';
+          if (ok) matched = true;
+        });
+        section.classList.toggle('collapsed', !matched && !!q ? true : section.classList.contains('collapsed'));
+        if (q && matched) section.classList.remove('collapsed');
+        section.querySelectorAll('.functionality-group').forEach(group => {
+          const visible = Array.from(group.querySelectorAll('.shortcut-item')).some(item => item.style.display !== 'none');
+          group.style.display = visible ? '' : 'none';
+        });
+      });
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.copy-btn');
+      if (!btn) return;
+      const text = btn.getAttribute('data-code') || btn.getAttribute('onclick') || '';
+      const code = btn.getAttribute('onclick')?.match(/copyToClipboard\((.*)\)/)?.[1];
+      const toCopy = btn.dataset.code || btn.getAttribute('data-copy') || btn.previousElementSibling?.querySelector('code')?.textContent?.trim() || '';
+      navigator.clipboard.writeText(toCopy).then(() => {
+        const old = btn.textContent;
+        btn.textContent = '✅';
+        setTimeout(() => btn.textContent = old, 900);
+      }).catch(() => {
+        const old = btn.textContent;
+        btn.textContent = '❌';
+        setTimeout(() => btn.textContent = old, 900);
+      });
+    });
+
+    // Support the inline onclicks already present in the imported content.
+    window.copyToClipboard = function(text) {
+      navigator.clipboard.writeText(String(text).replace(/^['"]|['"]$/g, ''));
+    };
+
+    // Keyboard shortcuts requested in the TOC.
+    document.addEventListener('keydown', (e) => {
+      if (e.target && ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      if (e.key === '/' ) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+      if (e.key === 't') {
+        e.preventDefault();
+        themeBtn.click();
+      }
+      if (e.key === 'e' && document.activeElement && document.activeElement.classList.contains('mode-header')) {
+        e.preventDefault();
+        toggleSection(document.activeElement.closest('.mode-section'));
+      }
+    });
+  </script>
+</body>
+</html>
