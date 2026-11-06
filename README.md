@@ -1,25 +1,44 @@
 # Linux & Systems Administration References
 
-A small collection of browser-based references built to make frequently used Linux and systems-administration material easier to navigate.
+A collection of lightweight, browser-based references for Linux and systems-administration workflows.
 
 ## Included tools
 
-- **Vim Cheat Sheet** — searchable, visual reference for Vim commands and workflows.
-- **Sudoers Rule Explorer** — interactive reference for understanding sudoers rule structure.
+### Vim Cheat Sheet
 
-## Usage
+A structured Vim reference covering navigation, editing, visual mode, registers, buffers, windows, search, replacement, macros, and clipboard-related commands.
 
-These are static HTML resources. Clone or download the repository and open the relevant HTML file in a modern browser. No build step is required.
+[Open the Vim Cheat Sheet](./vim-cheatsheet.html)
 
-## Scope
+### Sudoers Rule Explorer
 
-This repository is a personal learning and reference project. Verify commands and configuration syntax against the documentation for the specific operating-system and software versions in use. The material is not a substitute for reviewing local man pages or vendor documentation.
+An interactive reference for exploring sudoers rule structure and understanding how users, hosts, run-as identities, commands, and tags fit together.
 
-## Repository
+[Open the Sudoers Rule Explorer](./sudoers_rule_explorer.html)
 
-- [Vim Cheat Sheet](./vim-cheatsheet.html)
-- [Sudoers Rule Explorer](./sudoers_rule_explorer.html)
+## Run locally
+
+No build process or package installation is required.
+
+Clone or download the repository, then open either HTML file in a modern browser. The pages are static client-side tools and do not require an application backend.
+
+The Vim page loads two illustrative images from the official Vim website. An internet connection is required for those images; the rest of the reference is local.
+
+## Accuracy and safe use
+
+These are learning references, not substitutes for authoritative documentation.
+
+- Verify Vim behavior against the installed version and `vim(1)` / `:help`.
+- Review sudoers syntax and policy using `man sudoers` on the target system.
+- Validate sudoers changes with `visudo` and understand the impact before applying them.
+- Never copy example sudo rules into production without reviewing the security implications.
+
+## Project scope
+
+The repository currently contains static reference pages. It does not modify system configuration, execute shell commands, or inspect the host operating system.
 
 ## License
 
-No license is currently declared. Unless a license is added, standard copyright applies and reuse is not automatically granted.
+The original project code and authored reference material are licensed under the MIT License. See [LICENSE](./LICENSE).
+
+The Vim name and externally loaded Vim images belong to their respective rights holders. Their inclusion is for identification and reference and does not imply endorsement.
