@@ -37,8 +37,11 @@ These are learning references, not substitutes for authoritative documentation.
 
 The repository currently contains static reference pages. It does not modify system configuration, execute shell commands, or inspect the host operating system.
 
-## License
+## License and permissions
 
-The original project code and authored reference material are licensed under the MIT License. See [LICENSE](./LICENSE).
+This repository is **proprietary; all rights reserved**. You may view it where access is granted. For a public repository, GitHub's Terms of Service permit users to view and fork it on GitHub. Those platform permissions do not grant a general right to reuse, modify, redistribute, sublicense, or commercially exploit the original material outside GitHub.
 
-The Vim name and externally loaded Vim images belong to their respective rights holders. Their inclusion is for identification and reference and does not imply endorsement.
+Obtain prior, express, written permission from the copyright holder before any such use beyond the rights GitHub grants. Sending a request is not approval; wait for written authorization. See [LICENSE](./LICENSE) for the full scope, exclusions, permission-request route, and treatment of earlier license grants.
+
+**Third-party material:** This notice covers only original material that the repository owner owns or is authorized to license. Third-party software, images, fonts, trademarks, curricula, standards, datasets, contributions, and other external content remain subject to their respective rights and terms. This repository does not relicense them.
+
